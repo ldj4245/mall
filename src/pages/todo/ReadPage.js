@@ -1,26 +1,47 @@
 import { useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  createSearchParams,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 
 const ReadPage = () => {
   const { tno } = useParams();
 
   const navigate = useNavigate();
 
+  const [queryParams] = useSearchParams();
+
+  const page = queryParams.get("page") ? parseInt(queryParams.get("page")) : 1;
+
+  const size = queryParams.get("size") ? parseInt(queryParams.get("size")) : 10;
+
+  const queryStr = createSearchParams({ page, size }).toString();
+
   const moveToModify = useCallback(
     (tno) => {
-      navigate({ pathname: `/todo/modify/${tno}` });
+      navigate({
+        pathname: `/todo/modify/${tno}`,
+        search: queryStr,
+      });
     },
-    [tno]
+    [tno, page, size]
   );
+
+  const moveToList = useCallback(() => {
+    navigate({ pathname: `/todo/list`, search: queryStr });
+  }, [page, size]);
 
   return (
     <div className="text-3xl font-extrabold">
-      To Read Page Component {tno}
+      Todo Read Page Component {tno}
       <div>
-        <button onClick={() => moveToModify(33)}>Test Modify</button>
+        <button onClick={() => moveToModify(tno)}>Test Modify</button>
+
+        <buton onClick={() => moveToList()}>Test List</buton>
       </div>
     </div>
   );
 };
-
 export default ReadPage;
